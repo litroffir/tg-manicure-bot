@@ -10,16 +10,11 @@ from utils.dates import generate_dates
 def main_menu_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💅 Записаться", callback_data="book"),
-         InlineKeyboardButton(text="📝 Мои записи", callback_data="my_bookings")]
+         InlineKeyboardButton(text="📝 Мои записи", callback_data="my_bookings")],
+        [InlineKeyboardButton(text="🌟 Наши мастера", callback_data="masters")]
     ])
 
 
-# def master_choice_kb():
-#     return InlineKeyboardMarkup(inline_keyboard=[
-#         [InlineKeyboardButton(text="Ксения 💅", callback_data="master_kseniya")],
-#         [InlineKeyboardButton(text="Анастасия 👑", callback_data="master_anastasia")],
-#         [InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_menu")]
-#     ])
 def master_choice_kb(edit_mode: bool = False, booking_id: str = None):
     text_suffix = f"_edit_{booking_id}" if edit_mode else ""
     back_suffix = "_bookings" if edit_mode else "_menu"

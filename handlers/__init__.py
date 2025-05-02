@@ -1,6 +1,6 @@
 # Импортируем обработчики из модулей
-from handlers.start import start, start_router
-from handlers.booking import (
+from .start import start, start_router
+from .booking import (
     choose_master,
     choose_service,
     choose_date,
@@ -8,7 +8,7 @@ from handlers.booking import (
     confirm_booking,
     book_router
 )
-from handlers.bookings_management import (
+from .bookings_management import (
     show_bookings,
     handle_booking_selection,
     edit_booking,
@@ -20,6 +20,10 @@ from .common import (
     back_to_masters,
     back_to_services,
     back_router
+)
+
+from .masters import (
+    master_router
 )
 
 # Экспортируем всё, что должно быть доступно извне
@@ -40,5 +44,6 @@ __all__ = [
     'back_to_masters',
     'back_to_services',
     'back_router',
-    'book_management_router'
+    'book_management_router',
+    'master_router'
 ]

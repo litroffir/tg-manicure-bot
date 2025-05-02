@@ -1,9 +1,7 @@
-from aiogram import Dispatcher
+from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
-from config import set_commands
-from handlers import start_router, book_router, back_router, book_management_router
-from config import bot
-from utils.middleware import MessageUpdaterMiddleware
+from config_reader import set_commands, config
+from handlers import start_router, book_router, back_router, book_management_router, master_router
 from utils.storage import BotHolder
 
 import logging
@@ -15,6 +13,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+bot = Bot(token=config.bot_token.get_secret_value())
+
 
 async def on_startup():
     await set_commands(bot)
@@ -25,9 +25,9 @@ async def main():
 
     dp = Dispatcher(storage=MemoryStorage())
 
-    # dp.update.middleware(MessageUpdaterMiddleware())
     dp.include_router(start_router)
     dp.include_router(book_management_router)
+    dp.include_router(master_router)
     dp.include_router(book_router)
     dp.include_router(back_router)
     dp.startup.register(on_startup)

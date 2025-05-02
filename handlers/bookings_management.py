@@ -49,22 +49,6 @@ async def show_bookings(callback: types.Message | types.CallbackQuery, state: FS
     await state.set_state(BookingStates.viewing_bookings)
 
 
-# В обработчике handle_booking_selection добавим функцию обновления сообщения
-# async def update_booking_message(callback: types.CallbackQuery, booking: dict, booking_id):
-#     text = (
-#         f"👩🎨 Мастер: {booking['master']}\n"
-#         f"💅 Услуга: {booking['service']}\n"
-#         f"📅 Дата: {booking['date']}\n"
-#         f"📝 Пожелания: {booking['wishes']}"
-#     )
-#
-#     try:
-#         await callback.message.edit_text(
-#             f"📄 Детали записи (обновлено):\n\n{text}",
-#             reply_markup=booking_selection_kb(booking_id)
-#         )
-#     except Exception as e:
-#         await callback.answer("Не удалось обновить сообщение", show_alert=True)
 # Обработчик выбора конкретной записи
 @book_management_router.callback_query(F.data.startswith("view_booking_"))
 async def handle_booking_selection(callback: types.CallbackQuery, state: FSMContext):

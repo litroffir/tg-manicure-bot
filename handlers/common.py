@@ -4,7 +4,6 @@ from aiogram import Router, F, types
 from aiogram.fsm.context import FSMContext
 
 from handlers import choose_master, start, choose_service, show_bookings
-from utils.storage import BotHolder
 
 back_router = Router()
 
@@ -12,9 +11,7 @@ back_router = Router()
 # Обработка кнопок "Назад"
 @back_router.callback_query(F.data == "back_to_menu")
 async def back_to_menu(callback: types.CallbackQuery, state: FSMContext):
-    bot = BotHolder.get_bot()
-    await bot.delete_message(chat_id=callback.from_user.id, message_id=callback.message.message_id)
-    await start(callback.message, state)
+    await start(callback, state)
 
 
 @back_router.callback_query(F.data == "back_to_masters")

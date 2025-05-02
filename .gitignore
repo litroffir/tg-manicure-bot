@@ -1,15 +1,3 @@
 .env
 .env.local
 *.env
-/aiogram_main.py
-/utils/middleware.py
-/utils/inactivity.py
-/trash/conv1.py
-/trash/conversationbot
-/trash/inline.py
-/trash/inlinev2.py
-/trash/main.py
-/trash/main_test.py
-/trash/payment.py
-/trash/persistent.py
-/trash/test.py

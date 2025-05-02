@@ -1,3 +1,6 @@
 .env
 .env.local
 *.env
+/aiogram_main.py
+/utils/middleware.py
+/utils/inactivity.py

@@ -1,9 +1,6 @@
 # Импортируем утилиты из модулей
 from .dates import generate_dates
-from .inactivity import (
-    check_inactivity,
-    reset_inactivity_timer
-)
+
 from .keyboards import (
     main_menu_kb,
     master_choice_kb,
@@ -23,8 +20,6 @@ from .storage import (
 # Экспортируем всё, что должно быть доступно извне
 __all__ = [
     'generate_dates',
-    'check_inactivity',
-    'reset_inactivity_timer',
     'main_menu_kb',
     'master_choice_kb',
     'service_choice_kb',

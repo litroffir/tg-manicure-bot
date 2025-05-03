@@ -1,6 +1,5 @@
 .env
 .env.local
 *.env
-venv
+venv/
 /utils/middleware.py
-utils

@@ -11,10 +11,10 @@ from .keyboards import (
     booking_selection_kb,
     edit_booking_kb
 )
-from .storage import (
-    get_user_bookings,
-    add_booking,
-    delete_booking
+
+from .database import (
+    async_session,
+    DATABASE_URL
 )
 
 # Экспортируем всё, что должно быть доступно извне
@@ -25,10 +25,9 @@ __all__ = [
     'service_choice_kb',
     'dates_kb',
     'wishes_kb',
-    'get_user_bookings',
-    'add_booking',
-    'delete_booking',
     'bookings_kb',
     'booking_selection_kb',
-    'edit_booking_kb'
+    'edit_booking_kb',
+    "async_session",
+    "DATABASE_URL"
 ]

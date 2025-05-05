@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import numpy as np
+
 from datetime import datetime
 
 from aiogram import types, F, Router
@@ -8,6 +10,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
 from handlers import start
+from models import Appointment
 from states import BookingStates
 from utils import (
     master_choice_kb,
@@ -15,7 +18,7 @@ from utils import (
     dates_kb,
     wishes_kb
 )
-from utils.storage import user_bookings
+from utils import async_session
 
 book_router = Router()
 
@@ -85,19 +88,20 @@ async def enter_wishes(callback: types.CallbackQuery, state: FSMContext):
 async def confirm_booking(message: types.Message, state: FSMContext):
     data = await state.get_data()
     wishes = "не указаны" if message.text == "Пропустить" else message.text
+    booking_id = datetime.now().strftime("%Y%m%d%H%M%S")
 
     # Сохраняем запись
-    booking_id = datetime.now().strftime("%Y%m%d%H%M%S")
-    user_id = message.from_user.id
-    if user_id not in user_bookings:
-        user_bookings[user_id] = {}
-
-    user_bookings[user_id][booking_id] = {
-        "master": data['master'],
-        "service": data['service'],
-        "date": data['date'],
-        "wishes": wishes
-    }
+    async with async_session() as session:
+        new_appointment = Appointment(
+            user_id=message.from_user.id,
+            booking_id=np.int64(booking_id),
+            master=data['master'],
+            service=data['service'],
+            wishes=wishes,
+            date_time=data["date"]
+        )
+        session.add(new_appointment)
+        await session.commit()
 
     text = (
         "✨ *Запись подтверждена!* ✨\n\n"

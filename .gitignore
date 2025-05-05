@@ -2,4 +2,5 @@
 .env.local
 *.env
 venv/
-/utils/middleware.py
+/docker-compose.yml
+/alembic.ini

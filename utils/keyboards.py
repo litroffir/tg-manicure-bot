@@ -69,12 +69,13 @@ def wishes_kb():
 
 def bookings_kb(bookings):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[])
-    for booking_id, booking in bookings.items():
-        text = f"{booking['date']} - {booking['service']} ({booking['master']})"
+    for data in bookings:
+        # print(data.booking_id)
+        text = f"{data.date_time} - {data.service} ({data.master})"
         keyboard.inline_keyboard.append([
             InlineKeyboardButton(
                 text=text,
-                callback_data=f"view_booking_{booking_id}"
+                callback_data=f"view_booking_{data.booking_id}"
             )
         ])
 

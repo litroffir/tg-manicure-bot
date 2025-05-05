@@ -9,17 +9,11 @@ from .booking import (
     book_router
 )
 from .bookings_management import (
-    show_bookings,
     handle_booking_selection,
+    show_bookings,
     edit_booking,
     delete_booking,
     book_management_router
-)
-from .common import (
-    back_to_menu,
-    back_to_masters,
-    back_to_services,
-    back_router
 )
 
 from .masters import (
@@ -36,14 +30,10 @@ __all__ = [
     'enter_wishes',
     'confirm_booking',
     'book_router',
-    'show_bookings',
     'handle_booking_selection',
+    'show_bookings',
     'edit_booking',
     'delete_booking',
-    'back_to_menu',
-    'back_to_masters',
-    'back_to_services',
-    'back_router',
     'book_management_router',
-    'master_router'
+    'master_router',
 ]

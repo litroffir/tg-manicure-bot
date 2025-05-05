@@ -1,5 +1,5 @@
 from aiogram.types import BotCommand
-from pydantic import SecretStr
+from pydantic import SecretStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 COMMANDS = [
@@ -14,9 +14,35 @@ async def set_commands(bot):
     await bot.set_my_commands(COMMANDS)
 
 
-class Settings(BaseSettings):
-    bot_token: SecretStr
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+class ConfigBase(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
 
-config = Settings()
+class TGConfig(ConfigBase):
+    model_config = SettingsConfigDict(env_prefix="BOT_")
+
+    token: SecretStr
+
+
+class DBConfig(ConfigBase):
+    model_config = SettingsConfigDict(env_prefix="POSTGRES_")
+
+    host: SecretStr
+    port: SecretStr
+    db: SecretStr
+    user: SecretStr
+    password: SecretStr
+
+
+class Config(BaseSettings):
+    telegram: TGConfig = Field(default_factory=TGConfig)
+    db: DBConfig = Field(default_factory=DBConfig)
+
+    @classmethod
+    def load(cls) -> "Config":
+        return cls()
+
+
+config = Config()

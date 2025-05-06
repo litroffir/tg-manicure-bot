@@ -3,3 +3,4 @@
 *.env
 venv/
 /docker-compose.yml
+__pycache__/

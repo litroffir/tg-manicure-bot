@@ -1,6 +1,0 @@
-.env
-.env.local
-*.env
-venv/
-/docker-compose.yml
-/alembic.ini

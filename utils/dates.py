@@ -193,4 +193,4 @@ async def get_time_slots():
     return times
 
 
-myCalendar = CustomCalendar(locale="ru_RU")
+myCalendar = CustomCalendar(locale="ru_RU.UTF-8")

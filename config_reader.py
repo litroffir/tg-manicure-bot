@@ -24,7 +24,7 @@ class TGConfig(ConfigBase):
     model_config = SettingsConfigDict(env_prefix="BOT_")
 
     token: SecretStr
-    admin_id: int
+    admin_id: list
 
 
 class DBConfig(ConfigBase):

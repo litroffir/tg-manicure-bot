@@ -36,7 +36,7 @@ async def start(callback: types.Message | types.CallbackQuery, state: FSMContext
             text="🌸 *Добро пожаловать в Beauty Bits!* 🌸\n\n"
                  "🎀 *Акция:* Первый визит со скидкой 15%!\n\n"
                  "Выберите действие:",
-            reply_markup=main_menu_kb(is_admin=callback.from_user.id == config.telegram.admin_id),
+            reply_markup=main_menu_kb(is_admin=callback.from_user.id in config.telegram.admin_id),
             parse_mode="Markdown"
         )
     else:
@@ -44,6 +44,6 @@ async def start(callback: types.Message | types.CallbackQuery, state: FSMContext
             text="🌸 *Добро пожаловать в Beauty Bits!* 🌸\n\n"
                  "🎀 *Акция:* Первый визит со скидкой 15%!\n\n"
                  "Выберите действие:",
-            reply_markup=main_menu_kb(is_admin=callback.from_user.id == config.telegram.admin_id),
+            reply_markup=main_menu_kb(is_admin=callback.from_user.id in config.telegram.admin_id),
             parse_mode="Markdown"
         )

@@ -1,5 +1,10 @@
 FROM python
 
+RUN apt-get update && apt-get install -y locales
+RUN sed -i '/ru_RU/s/^# //g' /etc/locale.gen && locale-gen
+ENV LANG ru_RU
+ENV LC_ALL ru_RU
+
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./

@@ -3,7 +3,7 @@ from __future__ import annotations
 from aiogram import Router, F, types
 from aiogram.fsm.context import FSMContext
 
-from handlers import start, choose_master, choose_service
+from handlers import start, choose_master, choose_service, choose_date
 
 back_router = Router()
 
@@ -29,3 +29,9 @@ async def back_to_services(callback: types.CallbackQuery, state: FSMContext):
 async def back_to_bookings(callback: types.Message | types.CallbackQuery, state: FSMContext):
     from handlers import show_bookings
     await show_bookings(callback, state)
+
+
+@back_router.callback_query(F.data == "back_to_calendar")
+async def back_to_calendar(callback: types.CallbackQuery, state: FSMContext):
+    await choose_date(callback, state)
+

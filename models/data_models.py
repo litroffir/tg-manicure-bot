@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger
+from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -19,4 +19,11 @@ class Appointment(Base):
     master = Column(String)
     service = Column(String)
     wishes = Column(String)
-    date_time = Column(String)
+    start_datetime = Column(DateTime)
+    end_datetime = Column(DateTime)
+
+
+class WorkingTime(Base):
+    __tablename__ = "work_time"
+    id = Column(Integer, primary_key=True)
+    time = Column(String)

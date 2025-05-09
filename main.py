@@ -1,8 +1,12 @@
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
 from config_reader import set_commands, config
 from handlers import start_router, book_router, book_management_router, master_router
 from back_handlers import back_router
+from utils import delete_expired_appointments
 from utils.storage import BotHolder
 
 import logging
@@ -17,8 +21,20 @@ logger = logging.getLogger(__name__)
 bot = Bot(token=config.telegram.token.get_secret_value())
 
 
+async def start_scheduler():
+    scheduler = AsyncIOScheduler(timezone="Europe/Moscow")  # Укажите свой часовой пояс
+
+    scheduler.add_job(
+        delete_expired_appointments,
+        trigger=IntervalTrigger(minutes=30)
+    )
+
+    scheduler.start()
+
+
 async def on_startup():
     await set_commands(bot)
+    await start_scheduler()
 
 
 async def main():

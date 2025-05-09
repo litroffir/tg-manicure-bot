@@ -13,6 +13,7 @@ from .bookings_management import (
     show_bookings,
     edit_booking,
     delete_booking,
+    show_users_appointments,
     book_management_router
 )
 
@@ -36,4 +37,5 @@ __all__ = [
     'delete_booking',
     'book_management_router',
     'master_router',
+    'show_users_appointments'
 ]

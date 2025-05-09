@@ -6,6 +6,7 @@ class BookingStates(StatesGroup):
     choosing_master = State()
     choosing_service = State()
     choosing_date = State()
+    choosing_time = State()
     entering_wishes = State()
     viewing_bookings = State()
     editing_booking = State()

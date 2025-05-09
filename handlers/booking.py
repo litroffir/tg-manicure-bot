@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import numpy as np
 
-from datetime import datetime
+import datetime
 
 from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
+from aiogram_calendar import SimpleCalendarCallback
+
+from sqlalchemy import select
 
 from handlers import start
 from models import Appointment
@@ -15,9 +18,10 @@ from states import BookingStates
 from utils import (
     master_choice_kb,
     service_choice_kb,
-    dates_kb,
-    wishes_kb
+    wishes_kb,
+    time_keyboard, get_time_slots, myCalendar
 )
+
 from utils import async_session
 
 book_router = Router()
@@ -38,11 +42,15 @@ async def choose_master(callback: types.Message | types.CallbackQuery, state: FS
 @book_router.callback_query(F.data.startswith("master_"))
 async def choose_service(callback: types.CallbackQuery, state: FSMContext):
     master = callback.data.split("_")[1]
-    await state.update_data(master="Ксения" if master == "kseniya" else "Анастасия")
+    if master == "kseniya":
+        await state.update_data(master="Ксения")
+    elif master == "anastasia":
+        await state.update_data(master="Анастасия")
 
+    data = await state.get_data()
     await callback.message.edit_text(
         "Выберите услугу:",
-        reply_markup=service_choice_kb(master)
+        reply_markup=service_choice_kb("kseniya" if data["master"] == "Ксения" else "anastasia")
     )
     await state.set_state(BookingStates.choosing_service)
 
@@ -57,24 +65,65 @@ async def choose_date(callback: types.CallbackQuery, state: FSMContext):
         await state.update_data(service="Аппаратный маникюр")
     elif service == "manicure":
         await state.update_data(service="Маникюр")
-    else:
+    elif service == "pedicure":
         await state.update_data(service="Педикюр")
 
     await callback.message.edit_text(
-        f"Выберите дату:",
-        reply_markup=dates_kb()
+        "Выберите дату:",
+        reply_markup=await myCalendar.start_calendar()
     )
     await state.set_state(BookingStates.choosing_date)
 
 
-# Ввод пожеланий
-@book_router.callback_query(F.data.startswith("date_"))
-async def enter_wishes(callback: types.CallbackQuery, state: FSMContext):
-    date = callback.data.split("_", 1)[1]
-    await state.update_data(date=date)
+@book_router.callback_query(SimpleCalendarCallback.filter())
+async def choose_time(callback: types.CallbackQuery, callback_data: dict, state: FSMContext):
+    selected, date_selected = await myCalendar.process_selection(callback, callback_data, state)
+    if not selected:
+        return
+    convrt_date = datetime.date(year=date_selected.year, month=date_selected.month, day=date_selected.day)
+    if convrt_date < datetime.date.today() or convrt_date.isoweekday() in (6, 7):
+        await callback.answer("В этот день мы не работаем😥", show_alert=True)
+        return
+    await state.update_data(selected_date=convrt_date)
 
     await callback.message.edit_text(
-        f"Выбрана дата: {date}\nНапишите ваши пожелания:"
+        "Выберите время:",
+        reply_markup=time_keyboard(await get_time_slots())
+    )
+    await state.set_state(BookingStates.choosing_time)
+
+
+@book_router.callback_query(F.data.startswith("time_"))
+async def enter_wishes(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    selected_time = callback.data.split("_")[1]
+    start_dttm = datetime.datetime(year=data["selected_date"].year, month=data["selected_date"].month,
+                                   day=data["selected_date"].day,
+                                   hour=int(selected_time.split('-')[0].split(":")[0]),
+                                   minute=int(selected_time.split('-')[0].split(":")[1]), second=0)
+    end_dttm = datetime.datetime(year=data["selected_date"].year, month=data["selected_date"].month,
+                                 day=data["selected_date"].day,
+                                 hour=int(selected_time.split('-')[1].split(":")[0]),
+                                 minute=int(selected_time.split('-')[1].split(":")[1]), second=0)
+    if start_dttm < datetime.datetime.now():
+        await callback.answer("Слишком поздно😥", show_alert=True)
+        return
+
+    async with async_session() as session:
+        existing = (await session.execute(
+            select(Appointment).where((Appointment.start_datetime == start_dttm)
+                                      & (Appointment.end_datetime == end_dttm)
+                                      & (Appointment.master == data["master"]))
+        )).scalar_one_or_none()
+
+        if existing:
+            await callback.answer("Это время уже занято! Выберите другое.", show_alert=True)
+            return
+
+    await state.update_data(selected_start_datetime=start_dttm, selected_end_datetime=end_dttm)
+    await callback.message.edit_text(
+        f"Выбрана дата: {data['selected_date']}\n"
+        f"Время: {start_dttm.strftime('%H:%M')}-{end_dttm.strftime('%H:%M')}\nНапишите ваши пожелания:"
     )
     await callback.message.answer(
         "Или нажмите 'Пропустить'",
@@ -88,7 +137,7 @@ async def enter_wishes(callback: types.CallbackQuery, state: FSMContext):
 async def confirm_booking(message: types.Message, state: FSMContext):
     data = await state.get_data()
     wishes = "не указаны" if message.text == "Пропустить" else message.text
-    booking_id = datetime.now().strftime("%Y%m%d%H%M%S")
+    booking_id = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     # Сохраняем запись
     async with async_session() as session:
@@ -98,16 +147,17 @@ async def confirm_booking(message: types.Message, state: FSMContext):
             master=data['master'],
             service=data['service'],
             wishes=wishes,
-            date_time=data["date"]
+            start_datetime=data['selected_start_datetime'],
+            end_datetime=data["selected_end_datetime"]
         )
         session.add(new_appointment)
         await session.commit()
 
     text = (
         "✨ *Запись подтверждена!* ✨\n\n"
-        f"👩🎨 Мастер: {data['master']}\n\n"
+        f"👩 Мастер: {data['master']}\n\n"
         f"💅 Услуга: {data['service']}\n\n"
-        f"📅 Дата: {data['date']}\n\n"
+        f"📅 Дата: {data['selected_start_datetime'].strftime('%Y-%m-%d %H:%M')}-{data['selected_end_datetime'].strftime('%H:%M')}\n\n"
         f"📝 Пожелания: {wishes}"
     )
 

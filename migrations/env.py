@@ -5,7 +5,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from utils import DATABASE_URL
-from models import User, Appointment, Base
+from models import User, Appointment, Base, WorkingTime
 
 import sys
 from os.path import dirname, abspath

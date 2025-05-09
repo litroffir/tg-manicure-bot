@@ -4,24 +4,36 @@ from aiogram.types import (
     ReplyKeyboardMarkup, KeyboardButton
 )
 
-from utils.dates import generate_dates
 
-
-def main_menu_kb():
-    return InlineKeyboardMarkup(inline_keyboard=[
+def main_menu_kb(is_admin: bool = False):
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💅 Записаться", callback_data="book"),
          InlineKeyboardButton(text="📝 Мои записи", callback_data="my_bookings")],
         [InlineKeyboardButton(text="🌟 Наши мастера", callback_data="masters")]
+    ])
+    if is_admin:
+        keyboard.inline_keyboard.append(
+            [InlineKeyboardButton(text="Посмотреть записи клиентов", callback_data="clients")])
+    return keyboard
+
+
+def admin_kb():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Записи на сегодня", callback_data="show_users_books_today")],
+        [InlineKeyboardButton(text="Записи на завтра", callback_data="show_users_books_tomorrow")],
+        [InlineKeyboardButton(text="Записи на неделю", callback_data="show_users_books_week")],
+        [InlineKeyboardButton(text="Записи на месяц", callback_data="show_users_books_month")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data=f"start")]
     ])
 
 
 def master_choice_kb(edit_mode: bool = False, booking_id: str = None):
     text_suffix = f"_edit_{booking_id}" if edit_mode else ""
-    back_suffix = "_bookings" if edit_mode else "_menu"
+    callback_suffix = "back_to_bookings" if edit_mode else "start"
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Ксения 💅", callback_data=f"master_kseniya{text_suffix}")],
         [InlineKeyboardButton(text="Анастасия 👑", callback_data=f"master_anastasia{text_suffix}")],
-        [InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to{back_suffix}")]
+        [InlineKeyboardButton(text="🔙 Назад", callback_data=callback_suffix)]
     ])
 
 
@@ -42,21 +54,8 @@ def service_choice_kb(master: str, edit_mode: bool = False, booking_id: str = No
         for text, data in services
     ]
     if not edit_mode:
-        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_masters")])
+        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data="book")])
 
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-
-def dates_kb(edit_mode: bool = False, booking_id: str = None):
-    dates = generate_dates()
-    buttons = [
-        [types.InlineKeyboardButton(text=date, callback_data=f"date_{date}")]
-        for date in dates
-    ]
-    if edit_mode:
-        buttons.append([types.InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_bookings")])
-    else:
-        buttons.append([types.InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_services")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
@@ -70,8 +69,7 @@ def wishes_kb():
 def bookings_kb(bookings):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[])
     for data in bookings:
-        # print(data.booking_id)
-        text = f"{data.date_time} - {data.service} ({data.master})"
+        text = f"{data.start_datetime.date()} - {data.service} ({data.master})"
         keyboard.inline_keyboard.append([
             InlineKeyboardButton(
                 text=text,
@@ -79,7 +77,7 @@ def bookings_kb(bookings):
             )
         ])
 
-    keyboard.inline_keyboard.append([InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_menu")])
+    keyboard.inline_keyboard.append([InlineKeyboardButton(text="🔙 Назад", callback_data="start")])
     return keyboard
 
 
@@ -91,6 +89,20 @@ def booking_selection_kb(booking_id: str):
         ],
         [types.InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_bookings")]
     ])
+    return keyboard
+
+
+def time_keyboard(available_slots: list, edit_mode: bool = False, booking_id: str = None):
+    text_suff = f"_{booking_id}" if edit_mode else ''
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[])
+    for slot in available_slots:
+        slot = slot.replace('"', '')
+        keyboard.inline_keyboard.append([InlineKeyboardButton(
+            text=slot,
+            callback_data=f"time_{slot}{text_suff}"
+        )])
+    if not edit_mode:
+        keyboard.inline_keyboard.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_calendar")])
     return keyboard
 
 

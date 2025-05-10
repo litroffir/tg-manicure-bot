@@ -4,20 +4,20 @@ services:
     environment:
       BOT_TOKEN: 7874319913:AAGiwx2NJfYVHigiu02M1oNYP8AaRCOkzr8
       BOT_ADMIN_ID: [981760042, 1608722917]
-      POSTGRES_HOST: localhost
+      POSTGRES_HOST: manicure-bot-krff.db-msk0.amvera.tech
       POSTGRES_PORT: 5432
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: manicure_bot
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: user_data
     depends_on:
       - postgres
   postgres:
     restart: always
     image: postgres:17
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: manicure_bot
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: user_data
     ports:
       - "5432:5432"
 #    volumes:

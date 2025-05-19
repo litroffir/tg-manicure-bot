@@ -273,8 +273,7 @@ async def process_edit_date_time(callback: types.CallbackQuery, state: FSMContex
     async with async_session() as session:
         existing = (await session.execute(
             select(Appointment).where((Appointment.start_datetime == start_dttm)
-                                      & (Appointment.end_datetime == end_dttm)
-                                      & (Appointment.master == data["master"]))
+                                      & (Appointment.end_datetime == end_dttm))
         )).scalar_one_or_none()
 
         if existing:

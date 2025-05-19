@@ -20,6 +20,3 @@ async def delete_expired_appointments():
                 await session.rollback()
                 raise e
             return result.rowcount > 0
-
-
-

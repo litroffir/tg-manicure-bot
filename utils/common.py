@@ -3,7 +3,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment
 
 
-async def generate_excel(data):
+async def generate_excel(data, stats: bool=False):
     if not data:
         return None
 
@@ -11,9 +11,14 @@ async def generate_excel(data):
         workbook = Workbook()
         sheet = workbook.active
 
-        sheet.append([
-            "Дата", "ФИО", "Юзернейм", "Мастер", "Услуга", "Пожелания"
-        ])
+        if stats:
+            sheet.append([
+                "id пользователя", "ФИО", "Юзернейм", "Количество активных записей"
+            ])
+        else:
+            sheet.append([
+                "Дата", "ФИО", "Юзернейм", "Мастер", "Услуга", "Пожелания"
+            ])
 
         for cell in sheet["1:1"]:
             cell.font = Font(bold=True)

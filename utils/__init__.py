@@ -10,7 +10,9 @@ from .keyboards import (
     booking_selection_kb,
     edit_booking_kb,
     time_keyboard,
-    admin_kb
+    admin_dates_kb,
+    admin_choice_kb,
+    admin_stats_kb
 )
 
 from .database import (
@@ -33,7 +35,9 @@ __all__ = [
     'time_keyboard',
     "async_session",
     "DATABASE_URL",
-    'admin_kb',
+    'admin_dates_kb',
     'generate_excel',
-    'delete_expired_appointments'
+    'delete_expired_appointments',
+    'admin_choice_kb',
+    'admin_stats_kb'
 ]

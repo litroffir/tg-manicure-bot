@@ -4,7 +4,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 from config_reader import set_commands, config
-from handlers import start_router, book_router, book_management_router, master_router
+from handlers import start_router, book_router, book_management_router, master_router, admin_router
 from back_handlers import back_router
 from utils import delete_expired_appointments
 from utils.storage import BotHolder
@@ -43,6 +43,7 @@ async def main():
     dp = Dispatcher(storage=MemoryStorage())
 
     dp.include_router(start_router)
+    dp.include_router(admin_router)
     dp.include_router(book_management_router)
     dp.include_router(master_router)
     dp.include_router(book_router)

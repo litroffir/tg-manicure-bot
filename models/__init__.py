@@ -1,5 +1,5 @@
 from .data_models import Base, User, Appointment, WorkingTime
-from .dao import AppointmentDAO
+from .dao import AppointmentDAO, BaseDAO
 
 # Экспортируем всё, что должно быть доступно извне
 __all__ = [
@@ -7,5 +7,6 @@ __all__ = [
     'User',
     'Appointment',
     'WorkingTime',
-    'AppointmentDAO'
+    'AppointmentDAO',
+    'BaseDAO'
 ]

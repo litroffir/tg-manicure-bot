@@ -13,14 +13,16 @@ from .bookings_management import (
     show_bookings,
     edit_booking,
     delete_booking,
-    show_users_appointments,
     book_management_router
 )
 
 from .masters import (
     master_router
 )
-
+from .admin import (
+    admin_router,
+    show_users_appointments
+)
 # Экспортируем всё, что должно быть доступно извне
 __all__ = [
     'start',
@@ -37,5 +39,6 @@ __all__ = [
     'delete_booking',
     'book_management_router',
     'master_router',
-    'show_users_appointments'
+    'show_users_appointments',
+    'admin_router'
 ]

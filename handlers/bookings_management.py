@@ -5,7 +5,7 @@ import datetime
 from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, BufferedInputFile
+from aiogram.types import InlineKeyboardMarkup
 from aiogram_calendar import SimpleCalendarCallback
 from sqlalchemy import select
 
@@ -16,8 +16,7 @@ from utils import (
     bookings_kb,
     booking_selection_kb,
     edit_booking_kb,
-    master_choice_kb, service_choice_kb, async_session, myCalendar, time_keyboard, get_time_slots, admin_kb,
-    generate_excel
+    master_choice_kb, service_choice_kb, async_session, myCalendar, time_keyboard, get_time_slots
 )
 
 book_management_router = Router()
@@ -318,64 +317,3 @@ async def process_edit_wishes(message: types.Message, state: FSMContext):
         await message.answer("Ошибка редактирования", show_alert=True)
 
 
-@book_management_router.callback_query(F.data == "clients")
-async def admin_kb_handler(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(
-        text="Выберите временной диапозон:",
-        reply_markup=admin_kb()
-    )
-
-
-@book_management_router.callback_query(F.data.startswith("show_users_books"))
-async def show_users_appointments(callback: types.CallbackQuery, state: FSMContext):
-    callback_date = callback.data.split("_")[-1]
-    if callback_date == "today":
-        result = await AppointmentDAO.select_appointments_by_date(datetime.date.today(), datetime.date.today())
-        if result:
-            await callback.message.edit_text(text="✨ *Текущие записи* ✨\n\n{}".format('\n'.join(result)), reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [InlineKeyboardButton(text="🔙 Назад", callback_data="clients")]]))
-        else:
-            await callback.answer("Записей нет!", show_alert=True)
-    elif callback_date == "tomorrow":
-        result = await AppointmentDAO.select_appointments_by_date(datetime.date.today() + datetime.timedelta(days=1),
-                                                                  datetime.date.today() + datetime.timedelta(days=1))
-        if result:
-            await callback.message.edit_text(text="✨ *Текущие записи* ✨\n\n{}".format('\n'.join(result)), reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [InlineKeyboardButton(text="🔙 Назад", callback_data="clients")]]))
-        else:
-            await callback.answer("Записей нет!", show_alert=True)
-    elif callback_date == "week":
-        start_date = datetime.datetime.now().date()
-        end_date = start_date + datetime.timedelta(days=7)
-        result = await AppointmentDAO.select_appointments_by_date(start_date=start_date, end_date=end_date, csv=True)
-
-        if result:
-            excel_data = await generate_excel(result)
-            excel_file = BufferedInputFile(
-                file=excel_data,
-                filename="weekly_appointments.xlsx"
-            )
-            await callback.message.reply_document(
-                document=excel_file,
-                caption="📊 Записи на ближайшую неделю"
-            )
-        else:
-            await callback.answer("Записей нет!", show_alert=True)
-    elif callback_date == "month":
-        start_date = datetime.datetime.now().date()
-        end_date = start_date + datetime.timedelta(days=30)
-        result = await AppointmentDAO.select_appointments_by_date(start_date=start_date, end_date=end_date, csv=True)
-        if result:
-            excel_data = await generate_excel(result)
-            excel_file = BufferedInputFile(
-                file=excel_data,
-                filename="monthly_appointments.xlsx"
-            )
-            await callback.message.reply_document(
-                document=excel_file,
-                caption="📊 Записи на ближайший месяц"
-            )
-        else:
-            await callback.answer("Записей нет!", show_alert=True)

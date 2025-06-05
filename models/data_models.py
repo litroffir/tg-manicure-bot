@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, DateTime, Date
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -9,6 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String)
     full_name = Column(String)
+    registration_date = Column(Date)
 
 
 class Appointment(Base):

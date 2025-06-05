@@ -13,17 +13,37 @@ def main_menu_kb(is_admin: bool = False):
     ])
     if is_admin:
         keyboard.inline_keyboard.append(
-            [InlineKeyboardButton(text="Посмотреть записи клиентов", callback_data="clients")])
+            [InlineKeyboardButton(text="Посмотреть данные по клиентам", callback_data="clients")])
     return keyboard
 
 
-def admin_kb():
+def admin_choice_kb():
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📝 Записи", callback_data="clients_books"),
+         InlineKeyboardButton(text="📊 Статистика", callback_data="clients_stats")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data=f"start")]
+    ])
+    return keyboard
+
+
+def admin_dates_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="Записи на сегодня", callback_data="show_users_books_today")],
         [InlineKeyboardButton(text="Записи на завтра", callback_data="show_users_books_tomorrow")],
         [InlineKeyboardButton(text="Записи на неделю", callback_data="show_users_books_week")],
         [InlineKeyboardButton(text="Записи на месяц", callback_data="show_users_books_month")],
-        [InlineKeyboardButton(text="🔙 Назад", callback_data=f"start")]
+        [InlineKeyboardButton(text="🔙 Назад", callback_data=f"clients")]
+    ])
+
+
+def admin_stats_kb():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="За сегодня", callback_data="show_users_stats_today")],
+        [InlineKeyboardButton(text="За вчера", callback_data="show_users_stats_yesterday")],
+        [InlineKeyboardButton(text="За прошлую неделю", callback_data="show_users_stats_week")],
+        [InlineKeyboardButton(text="За прошлый месяц", callback_data="show_users_stats_month")],
+        [InlineKeyboardButton(text="За всё время", callback_data="show_users_stats_all")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data=f"clients")]
     ])
 
 
